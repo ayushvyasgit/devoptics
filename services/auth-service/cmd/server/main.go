@@ -3,11 +3,13 @@ package main
 import (
 	"database/sql"
 	"log"
+	"time"
 
 	"github.com/ayushvyasgit/devoptics/services/auth-service/internal/config"
 	"github.com/ayushvyasgit/devoptics/services/auth-service/internal/handler"
 	"github.com/ayushvyasgit/devoptics/services/auth-service/internal/repository"
 	"github.com/ayushvyasgit/devoptics/services/auth-service/internal/service"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 )
@@ -40,6 +42,18 @@ func main() {
 	// Setup router
 	r := gin.Default()
 
+	// CORS Configuration - CRITICAL!
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
+	log.Println("✅ CORS enabled for http://localhost:3000")
+
 	r.GET("/health", authHandler.HealthCheck)
 
 	v1 := r.Group("/api/v1")
@@ -59,5 +73,3 @@ func main() {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }
-
-//

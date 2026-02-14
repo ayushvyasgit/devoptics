@@ -1,38 +1,112 @@
-package model
+package repository
 
 import (
-	"time"
+	"database/sql"
+	"errors"
 
+	"github.com/ayushvyasgit/devoptics/services/auth-service/internal/model"
 	"github.com/google/uuid"
 )
 
-type User struct {
-	ID             uuid.UUID  `json:"id" db:"id"`
-	OrganizationID *uuid.UUID `json:"organization_id,omitempty" db:"organization_id"`
-	Email          string     `json:"email" db:"email"`
-	PasswordHash   string     `json:"-" db:"password_hash"`
-	FirstName      string     `json:"first_name" db:"first_name"`
-	LastName       string     `json:"last_name" db:"last_name"`
-	Role           string     `json:"role" db:"role"`
-	IsActive       bool       `json:"is_active" db:"is_active"`
-	CreatedAt      time.Time  `json:"created_at" db:"created_at"`
-	UpdatedAt      time.Time  `json:"updated_at" db:"updated_at"`
+var ErrUserNotFound = errors.New("user not found")
+var ErrEmailExists = errors.New("email already exists")
+
+type UserRepository struct {
+	db *sql.DB
 }
 
-type RegisterRequest struct {
-	Email     string `json:"email" binding:"required,email"`
-	Password  string `json:"password" binding:"required,min=8"`
-	FirstName string `json:"first_name" binding:"required"`
-	LastName  string `json:"last_name" binding:"required"`
+func NewUserRepository(db *sql.DB) *UserRepository {
+	return &UserRepository{db: db}
 }
 
-type LoginRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
+func (r *UserRepository) Create(user *model.User) error {
+	query := `
+		INSERT INTO users (id, email, password_hash, first_name, last_name, role, is_active)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		RETURNING created_at, updated_at
+	`
+
+	err := r.db.QueryRow(
+		query,
+		user.ID,
+		user.Email,
+		user.PasswordHash,
+		user.FirstName,
+		user.LastName,
+		user.Role,
+		user.IsActive,
+	).Scan(&user.CreatedAt, &user.UpdatedAt)
+
+	if err != nil {
+		if err.Error() == `pq: duplicate key value violates unique constraint "users_email_key"` {
+			return ErrEmailExists
+		}
+		return err
+	}
+
+	return nil
 }
 
-type LoginResponse struct {
-	Token        string `json:"token"`
-	RefreshToken string `json:"refresh_token"`
-	User         *User  `json:"user"`
+func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
+	user := &model.User{}
+
+	query := `
+		SELECT id, email, password_hash, first_name, last_name, role, is_active, created_at, updated_at
+		FROM users
+		WHERE email = $1
+	`
+
+	err := r.db.QueryRow(query, email).Scan(
+		&user.ID,
+		&user.Email,
+		&user.PasswordHash,
+		&user.FirstName,
+		&user.LastName,
+		&user.Role,
+		&user.IsActive,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+
+	if err == sql.ErrNoRows {
+		return nil, ErrUserNotFound
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (r *UserRepository) FindByID(id uuid.UUID) (*model.User, error) {
+	user := &model.User{}
+
+	query := `
+		SELECT id, email, password_hash, first_name, last_name, role, is_active, created_at, updated_at
+		FROM users
+		WHERE id = $1
+	`
+
+	err := r.db.QueryRow(query, id).Scan(
+		&user.ID,
+		&user.Email,
+		&user.PasswordHash,
+		&user.FirstName,
+		&user.LastName,
+		&user.Role,
+		&user.IsActive,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+
+	if err == sql.ErrNoRows {
+		return nil, ErrUserNotFound
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
