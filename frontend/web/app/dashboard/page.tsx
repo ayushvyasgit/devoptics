@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-
+import Link from "next/link";
 export default function DashboardPage() {
   const router = useRouter();
   const { user, token, logout } = useAuthStore();
@@ -49,7 +49,12 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
-
+        
+        <div className="mt-6">
+  <Link href="/analyzer">
+    <Button>Go to Code Analyzer →</Button>
+  </Link>
+</div>
         <div className="mt-8">
           <Card>
             <CardHeader>
