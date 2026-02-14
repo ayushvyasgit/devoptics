@@ -102,3 +102,13 @@ cd web
 # Install dependencies
 npm install axios zustand clsx tailwind-merge lucide-react recharts
 
+
+#
+PS C:\Users\ayush\Desktop\devoptics> cd services
+PS C:\Users\ayush\Desktop\devoptics\services> cd auth-service
+PS C:\Users\ayush\Desktop\devoptics\services\auth-service> go mod tidy
+PS C:\Users\ayush\Desktop\devoptics\services\auth-service> 
+PS C:\Users\ayush\Desktop\devoptics\services\auth-service> go run cmd/server/main.go
+PS C:\Users\ayush\Desktop\devoptics\services\auth-service> go run cmd/server/main.go
+
+#
