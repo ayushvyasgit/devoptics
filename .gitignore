@@ -1,0 +1,82 @@
+﻿# .gitignore
+node_modules/
+__pycache__/
+*.pyc
+vendor/
+dist/
+build/
+*.exe
+*.out
+.env
+.env.local
+*.log
+.vscode/
+.idea/
+.DS_Store
+terraform.tfstate
+terraform.tfstate.backup
+
+# Node
+node_modules/
+.next/
+.env
+.env.local
+
+# Go
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+vendor/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Docker
+postgres_data/
+redis_data/
+mongodb_data/
+# =========================
+# Python
+# =========================
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+
+# AI model files
+*.pkl
+*.pt
+*.bin
+
+# =========================
+# Node
+# =========================
+node_modules/
+.next/
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Go
+# =========================
+bin/
